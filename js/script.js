@@ -1,36 +1,90 @@
 'use strict';
 
-const movieDataBase = {
-    movies: [
-        "Logan",
-        "Justice League",
-        "La La land",
-        "Obsession",
-        "Scott Pilgrim vs..."
-    ]
-};
+document.addEventListener('DOMContentLoaded', () => {
 
-const adv = document.querySelectorAll('.promo__adv img'),
-    poster = document.querySelector('.promo__bg'),
-    genre = poster.querySelector('.promo__genre'),
-    movieList = document.querySelector('.promo__interactive-list');
+    const movieDataBase = {
+        movies: [
+            "Logan",
+            "Justice League",
+            "La La land",
+            "Obsession",
+            "Scott Pilgrim vs..."
+        ]
+    };
 
-adv.forEach(item => {
-    item.remove();
-});
+    const adv = document.querySelectorAll('.promo__adv img'),
+        poster = document.querySelector('.promo__bg'),
+        genre = poster.querySelector('.promo__genre'),
+        movieList = document.querySelector('.promo__interactive-list'),
+        addForm = document.querySelector('form.add'),
+        addInput = addForm.querySelector('.adding__input'),
+        checkbox = addForm.querySelector('[type="checkbox"]');
 
-genre.textContent = 'drama';
+    addForm.addEventListener('submit', (event) => {
+        event.preventDefault();
 
-poster.style.backgroundImage = 'url("img/bg.jpg")';
+        let newFilm = addInput.value;
+        const favourite = checkbox.checked;
 
-movieList.innerHTML = "";
+        if (newFilm) {
 
-movieDataBase.movies.sort();
+            if (newFilm.length > 21) {
+                newFilm = `${newFilm.substring(0, 22)}...`;
+            }
 
-movieDataBase.movies.forEach((film, i) => {
-    movieList.innerHTML +=
-        `<li class="promo__interactive-item">${i + 1} ${film}
-        <div class="delete"></div>
-        </li>
-        `;
+            if (favourite) {
+                console.log("Adding favourite movie")
+            }
+
+            movieDataBase.movies.push(newFilm);
+            sortArr(movieDataBase.movies);
+
+            createMovieList(movieDataBase.movies, movieList);
+        }
+
+        event.target.reset();
+
+    });
+
+    const deleteAdv = (arr) => {
+        arr.forEach(item => {
+            item.remove();
+        });
+    };
+
+    const makeChanges = () => {
+        genre.textContent = 'Drama';
+
+        poster.style.backgroundImage = 'url("img/bg.jpg")';
+    };
+
+    const sortArr = (arr) => {
+        arr.sort();
+    };
+
+    function createMovieList(films, parent) {
+        parent.innerHTML = "";
+        sortArr(films);
+
+        films.forEach((film, i) => {
+            parent.innerHTML +=
+                `<li class="promo__interactive-item">${i + 1} ${film}
+            <div class="delete">
+            </div>
+            </li>`;
+        });
+
+        document.querySelectorAll('.delete').forEach((btn, i) => {
+            btn.addEventListener('click', () => {
+                btn.parentElement.remove();
+                movieDataBase.movies.splice(i, 1);
+                createMovieList(films, parent);
+            });
+        });
+    }
+
+    deleteAdv(adv);
+    makeChanges();
+    createMovieList(movieDataBase.movies, movieList);
+
 });
